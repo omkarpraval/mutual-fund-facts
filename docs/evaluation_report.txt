@@ -1,0 +1,91 @@
+ID   CAT            EXPECTED      GOT           CLS  RETR  CITE      ms
+E01  direct         factual       factual       ok   ok    ok       0.8
+E02  direct         factual       factual       ok   ok    ok       0.3
+E03  direct         factual       factual       ok   ok    ok       0.3
+E04  direct         factual       factual       ok   ok    ok       0.3
+E05  direct         factual       factual       ok   ok    ok       0.2
+E06  direct         factual       factual       ok   ok    ok       0.2
+E07  paraphrase     factual       factual       ok   ok    ok       0.4
+E08  paraphrase     factual       factual       ok   ok    ok       0.3
+E09  paraphrase     factual       factual       ok   ok    ok       0.2
+E10  alias          factual       factual       ok   ok    ok       0.2
+E11  alias          factual       factual       ok   ok    ok       0.3
+E12  alias          factual       factual       ok   ok    ok       0.2
+E13  advice         advice        advice        ok   -     -        0.1
+E14  advice         advice        advice        ok   -     -        0.1
+E15  advice         advice        advice        ok   -     -        0.1
+E16  advice         advice        advice        ok   -     -        0.1
+E17  pii            pii           pii           ok   -     -        0.0
+E18  gap            out_of_scope  out_of_scope  ok   -     -        0.1
+E19  gap            out_of_scope  out_of_scope  ok   -     -        0.1
+E20  out_of_corpus  out_of_scope  out_of_scope  ok   -     -        0.1
+E21  out_of_corpus  out_of_scope  out_of_scope  ok   -     -        0.1
+E22  ambiguous      needs_scheme  needs_scheme  ok   -     -        0.0
+E23  feasibility    factual       factual       ok   ok    ok       0.3
+E24  feasibility    factual       factual       ok   ok    ok       0.2
+E25  feasibility    factual       factual       ok   ok    ok       0.2
+E26  feasibility    factual       factual       ok   ok    ok       0.2
+E27  advice         advice        advice        ok   -     -        0.0
+E28  advice         advice        advice        ok   -     -        0.0
+E29  advice         advice        advice        ok   -     -        0.0
+E30  advice         advice        advice        ok   -     -        0.1
+E31  advice         advice        advice        ok   -     -        0.1
+E32  advice         advice        advice        ok   -     -        0.0
+E33  advice         advice        advice        ok   -     -        0.0
+E34  alias          factual       factual       ok   ok    ok       0.2
+E35  alias          factual       factual       ok   ok    ok       0.3
+E36  gap            out_of_scope  out_of_scope  ok   -     -        0.1
+E37  paraphrase     factual       factual       ok   ok    ok       0.3
+E38  paraphrase     factual       factual       ok   ok    ok       0.2
+E39  paraphrase     factual       factual       ok   ok    ok       0.2
+E40  out_of_corpus  out_of_scope  out_of_scope  ok   -     -        0.1
+E41  ambiguous_can  advice        advice        ok   -     -        0.0
+E42  ambiguous_can  advice        advice        ok   -     -        0.0
+E43  ambiguous_can  factual       factual       ok   ok    ok       0.2
+E44  pii            pii           pii           ok   -     -        0.0
+E45  paraphrase     factual       factual       ok   ok    ok       0.3
+E46  paraphrase     factual       factual       ok   ok    ok       0.3
+E47  paraphrase     factual       factual       ok   ok    ok       0.1
+E48  paraphrase     factual       factual       ok   ok    ok       0.2
+E49  out_of_corpus  out_of_scope  out_of_scope  ok   -     -        0.1
+E50  mixed          factual       factual       ok   ok    ok       0.2
+
+--- by category ---
+  advice          11/11
+  alias           5/5
+  ambiguous       1/1
+  ambiguous_can   3/3
+  direct          6/6
+  feasibility     4/4
+  gap             3/3
+  mixed           1/1
+  out_of_corpus   4/4
+  paraphrase      10/10
+  pii             2/2
+
+--- metrics ---
+  Routing accuracy      50/50  (100%)
+  Retrieval accuracy    27/27  (100%)
+  Citation present      27/27  (100%)
+  Refusal accuracy      11/11
+  PII leaks             0  (target 0)
+  Latency p50 / p95     0.2ms / 0.3ms
+--- held-out robustness by suite ---
+  advice               2/2
+  ambiguous_can        4/5
+  gap                  1/1
+  mixed                4/4
+  out_of_corpus        2/2
+  paraphrase           8/10
+  pii                  2/2
+  scheme_ambiguity     3/3
+
+  UNSEEN PARAPHRASE ROBUSTNESS: 26/29 (90%)
+
+--- failures (do not tune against these; fix, then promote to eval_set) ---
+  H28  expected factual      got out_of_scope | Whats the yearly cost of holding this?
+        unseen TER wording
+  H30  expected factual      got out_of_scope | Any charge if I pull out in the first month?
+        unseen exit load wording
+  H33  expected factual      got advice       | Can I switch between plans without a charge?
+        rule question

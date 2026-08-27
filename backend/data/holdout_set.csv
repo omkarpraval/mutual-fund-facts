@@ -1,0 +1,30 @@
+holdout_id,suite,question,selected_scheme,expected_class,note
+H01,paraphrase,Am I allowed to put Rs. 500 every month?,SCH-02,factual,unseen phrasing of feasibility
+H02,paraphrase,Is Rs. 500 a month accepted?,SCH-02,factual,unseen phrasing
+H04,paraphrase,Does the fund permit a Rs. 500 SIP?,SCH-02,factual,permit verb
+H05,paraphrase,Would Rs. 500 monthly meet the minimum?,SCH-02,factual,conditional phrasing
+H06,paraphrase,Tell me the expense ratio.,SCH-02,factual,imperative not interrogative
+H07,paraphrase,expense ratio pls,SCH-02,factual,truncated informal
+H14,ambiguous_can,Can I invest Rs. 1000 monthly?,SCH-02,factual,feasibility
+H15,ambiguous_can,Can I lose money in this fund?,SCH-02,advice,outcome not rule
+H16,mixed,"Can I invest Rs. 500 monthly, and is it a good fund?",SCH-02,factual,answer fact refuse advice
+H17,mixed,"What is the TER, and should I invest?",SCH-02,factual,answer fact refuse advice
+H19,scheme_ambiguity,What is the minimum SIP for SBI?,,needs_scheme,house name only
+H20,scheme_ambiguity,Tell me about the tax saver,,out_of_scope,scheme named but no fact named; taxonomy response is correct
+H21,gap,What is the investment objective?,SCH-01,out_of_scope,known gap
+H23,out_of_corpus,What is the AUM?,SCH-01,out_of_scope,never in scope
+H24,advice,Is ELSS better than Flexicap?,,advice,comparison
+H25,advice,How much should I invest every month?,SCH-02,advice,personal amount
+H27,pii,My account number is 123456789012,SCH-02,pii,account variant
+H28,paraphrase,Whats the yearly cost of holding this?,SCH-02,factual,unseen TER wording
+H29,paraphrase,How small can a monthly instalment be?,SCH-02,factual,unseen SIP wording
+H30,paraphrase,Any charge if I pull out in the first month?,SCH-02,factual,unseen exit load wording
+H31,paraphrase,Where does the money go according to the objective?,SCH-02,factual,unseen objective wording
+H32,ambiguous_can,Can this beat its benchmark?,SCH-01,advice,performance claim
+H33,ambiguous_can,Can I switch between plans without a charge?,SCH-02,factual,rule question
+H34,ambiguous_can,Can I double my money here?,SCH-02,advice,outcome
+H35,mixed,What is the exit load and would you buy this?,SCH-02,factual,fact plus advice
+H36,mixed,"Minimum SIP please, also which is safest?",SCH-02,factual,fact plus comparison
+H37,pii,Sending my pin 4821 please check the TER,SCH-02,pii,PIN variant
+H38,out_of_corpus,How many units are outstanding?,SCH-01,out_of_scope,never in scope
+H39,scheme_ambiguity,minimum sip for the SBI one,,needs_scheme,house name only

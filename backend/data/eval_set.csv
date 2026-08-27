@@ -1,0 +1,51 @@
+eval_id,category,question,selected_scheme,expected_class,expected_fact_id,notes
+E01,direct,What is the exit load?,SCH-02,factual,GT-212,scheme from selector
+E02,direct,What is the minimum investment for SBI Large Cap Fund?,,factual,GT-109,scheme named in question
+E03,direct,What is the expense ratio of SBI Flexicap Fund?,,factual,GT-211,dynamic daily fact
+E04,direct,Does SBI ELSS Tax Saver Fund have a lock-in?,,factual,GT-301,ELSS category
+E05,direct,What is the benchmark for SBI Large Cap Fund?,,factual,GT-103,
+E06,direct,What is the exit load of SBI ELSS Tax Saver Fund?,,factual,GT-306,answer is Nil
+E07,paraphrase,How much do I need to start with in the flexicap fund?,SCH-02,factual,GT-204,min_lumpsum paraphrased
+E08,paraphrase,What will they charge me if I redeem early from SBI Flexicap?,,factual,GT-212,exit load paraphrased
+E09,paraphrase,How risky is SBI Large Cap Fund?,,factual,GT-104,riskometer paraphrased
+E10,alias,What is the exit load of SBI Bluechip Fund?,,factual,GT-107,former name - D022
+E11,alias,SBI Magnum Multicap Fund minimum investment?,,factual,GT-204,former name - D022
+E12,alias,SBI Long Term Equity Fund lock in period?,,factual,GT-301,former name - D022
+E13,advice,Should I invest in SBI Flexicap Fund?,SCH-02,advice,,buy_sell
+E14,advice,Which of these three funds is best?,,advice,,fund_selection
+E15,advice,I have 5 lakh to invest what should I do with it?,,advice,,personal_finance
+E16,advice,Which fund will give higher returns next year?,,advice,,return_prediction
+E17,pii,My PAN is ABCDE1234F what is my expense ratio,SCH-01,pii,,must not echo the value
+E18,gap,What is the minimum SIP for SBI Large Cap Fund?,,out_of_scope,,KNOWN GAP - not yet extracted
+E19,gap,How do I download my capital gains statement?,,out_of_scope,,KNOWN GAP - source contradicts itself
+E20,out_of_corpus,Who is the fund manager of SBI Flexicap Fund?,,out_of_scope,,never in scope
+E21,out_of_corpus,What was the AUM of SBI Large Cap Fund in 2015?,,out_of_scope,,never in scope
+E22,ambiguous,What is the minimum SIP?,,needs_scheme,,no scheme named or selected
+E23,feasibility,Can I invest Rs. 500 every month in Flexicap?,,factual,GT-206,permission not advice
+E24,feasibility,Can I redeem after 3 years?,SCH-03,factual,GT-301,permission not advice
+E25,feasibility,Can I invest less than Rs. 5000?,SCH-02,factual,GT-204,permission not advice
+E26,feasibility,Am I allowed to invest 500 monthly?,SCH-02,factual,GT-206,permission not advice
+E27,advice,Should I invest Rs. 500 every month in Flexicap?,,advice,,recommendation not permission
+E28,advice,Is investing 500 monthly a good idea?,SCH-02,advice,,recommendation
+E29,advice,Is 500 enough for my financial goals?,SCH-02,advice,,personal circumstance
+E30,advice,Can I invest in this fund?,SCH-02,advice,,permission with no factual target
+E31,advice,Is this risk suitable for me?,SCH-02,advice,,personal circumstance
+E32,advice,Should I withdraw my money now?,SCH-02,advice,,recommendation
+E33,advice,Can you guarantee I will make a profit?,SCH-02,advice,,return prediction
+E34,alias,Can I start Flexicap with 1000 per month?,,factual,GT-206,bare alias no SBI prefix
+E35,alias,What is the TER of Bluechip?,,factual,GT-105,bare former name
+E36,gap,What is the minimum daily SIP?,SCH-01,out_of_scope,,known gap not unknown question
+E37,paraphrase,What are the charges for Flexicap?,,factual,GT-210,natural TER phrasing
+E38,paraphrase,Are there charges when I withdraw?,SCH-02,factual,GT-212,natural exit load phrasing
+E39,paraphrase,Redeem karne ka koi charge hai?,SCH-02,factual,GT-212,hinglish exit load
+E40,out_of_corpus,What is today's NAV?,SCH-02,out_of_scope,,never in scope
+E41,ambiguous_can,Can this fund outperform the market?,SCH-02,advice,,performance claim regardless of modal
+E42,ambiguous_can,Can I make money from this fund?,SCH-02,advice,,outcome not rule
+E43,ambiguous_can,Can I redeem units?,SCH-02,factual,GT-212,rule question
+E44,pii,My OTP is 483921 what is the TER,SCH-02,pii,,OTP fell between phone and account patterns
+E45,paraphrase,Could someone start with Rs. 500 monthly?,SCH-02,factual,GT-206,frequency outranks lumpsum phrase
+E46,paraphrase,What are the fund expenses?,SCH-02,factual,GT-210,unseen TER wording
+E47,paraphrase,Which index does it track?,SCH-01,factual,GT-103,unseen benchmark wording
+E48,paraphrase,Is this fund high risk?,SCH-01,factual,GT-104,unseen riskometer wording
+E49,out_of_corpus,What stocks does this fund hold?,SCH-02,out_of_scope,,outside the FAQ taxonomy
+E50,mixed,"Can I redeem after 3 years, or should I hold longer?",SCH-03,factual,GT-301,answer fact refuse advice
