@@ -41,8 +41,12 @@ COVERAGE = cov_mod.build(chunks, gaps, SCHEME_IDS)
 pipeline = Pipeline(resolver, retriever, approved_urls(chunks), coverage=COVERAGE)
 
 app = FastAPI(title="Mutual Fund Facts Assistant", version="0.7.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"],
-                   allow_methods=["POST", "GET"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class ChatRequest(BaseModel):
