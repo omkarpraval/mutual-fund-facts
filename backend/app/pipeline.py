@@ -23,6 +23,7 @@ from app.retrieval.normaliser import topic_of
 from app.retrieval.intent import resolve_topic
 from app.schemas import QueryClass
 from app import prompt, citation, feasibility, mixed, coverage as cov_mod
+from app.graph.workflow import build_graph
 
 
 @dataclass
@@ -47,96 +48,34 @@ class Pipeline:
         self.resolver, self.retriever = resolver, retriever
         self.approved_urls, self.generator = approved_urls, generator
         self.classifier, self.coverage = classifier, coverage
+        # Compile LangGraph state workflow
+        self.graph = build_graph(
+            resolver=resolver,
+            retriever=retriever,
+            approved_urls=approved_urls,
+            generator=generator,
+            classifier=classifier,
+            coverage=coverage
+        )
 
     def answer(self, question: str, selected_scheme_id: str | None = None) -> Response:
-        # 1. PII. Nothing logged or sent anywhere before this returns.
-        if kinds := pii.scan(question):
-            return Response(QueryClass.PII, pii.MESSAGE, debug={"pii_kinds": kinds})
+        initial_state = {
+            "question": question,
+            "selected_scheme_id": selected_scheme_id
+        }
+        final_state = self.graph.invoke(initial_state)
 
-        # 2. Local topic detection. No network, so guard ordering holds.
-        topic = topic_of(question)
-
-        # 3. Advice. Before refusing outright, check whether the question
-        #    mixes a separable factual clause with an advisory one.
-        partial = None
-        if kind := advice.detect(question, topic):
-            fact_clause, adv_kind = mixed.analyse(question, topic_of, advice.detect)
-            if fact_clause and adv_kind:
-                question, topic = fact_clause[0], fact_clause[1]
-                partial = advice.refusal_message(adv_kind)
-            else:
-                return Response(QueryClass.ADVICE, advice.refusal_message(kind),
-                                debug={"refusal_kind": kind.value})
-
-        # 4. Scheme. An explicit mention always overrides the selector, and
-        #    a mismatch is surfaced rather than silently resolved.
-        m = self.resolver.resolve(question, selected_scheme_id)
-        conflict = None
-        if (m.matched_on == "question_alias" and selected_scheme_id
-                and m.scheme_id != selected_scheme_id):
-            conflict = self.resolver.canonical(selected_scheme_id)
-
-        # 5. LLM topic only if local found nothing. After both guards.
-        how = "lookup"
-        if topic is None:
-            topic, how = resolve_topic(question, self.classifier)
-
-        if m.matched_on == "ambiguous":
-            return Response(QueryClass.NEEDS_SCHEME,
-                            "I have several SBI schemes in scope. Which one do you mean?",
-                            candidates=m.candidates or [])
-
-        if m.scheme_id is None and topic not in ("capital_gains_statement",):
-            return Response(QueryClass.NEEDS_SCHEME, prompt.NEEDS_SCHEME)
-
-        # 5b. Recognised scheme, unrecognised topic. Not a retrieval
-        #     failure: the question falls outside the FAQ taxonomy.
-        if topic is None and self.coverage:
-            avail = cov_mod.available_labels(self.coverage, m.scheme_id)
-            return Response(
-                QueryClass.OUT_OF_SCOPE,
-                f"I answer a defined set of factual questions, and this one "
-                f"isn't among them for {m.canonical_name}.",
-                scheme=m.canonical_name, conflict=conflict,
-                available=avail, partial_refusal=partial)
-
-        # 6. Known gap: we understood the question and do not have it verified.
-        if self.coverage and cov_mod.is_known_gap(self.coverage, m.scheme_id, topic):
-            avail = cov_mod.available_labels(self.coverage, m.scheme_id)
-            return Response(
-                QueryClass.OUT_OF_SCOPE,
-                f"I have verified information for {m.canonical_name}, but "
-                f"{cov_mod.label(topic).lower()} isn't in the official sources "
-                f"indexed for it yet.",
-                scheme=m.canonical_name, conflict=conflict,
-                known_gap=True, available=avail, partial_refusal=partial)
-
-        # 7. Retrieval.
-        drop = [m.matched_text] if m.matched_on == "question_alias" and m.matched_text else []
-        hits = self.retriever.search(question, scheme_id=m.scheme_id,
-                                     topic=topic, drop_terms=drop)
-        if not hits:
-            avail = cov_mod.available_labels(self.coverage, m.scheme_id) if self.coverage else []
-            return Response(QueryClass.OUT_OF_SCOPE, prompt.NO_EVIDENCE,
-                            scheme=m.canonical_name, conflict=conflict,
-                            available=avail, partial_refusal=partial)
-
-        cits = citation.build([h.chunk for h in hits])
-        if bad := citation.validate(cits, self.approved_urls):
-            return Response(QueryClass.OUT_OF_SCOPE, prompt.NO_EVIDENCE,
-                            debug={"unapproved_citations": bad})
-
-        # 8. Feasibility: a stated amount turns a lookup into a check.
-        lead = None
-        if topic == "min_sip":
-            amt = feasibility.parse_amount(question)
-            lead = feasibility.assess_sip(m.canonical_name, amt,
-                                          feasibility.parse_frequency(question))
-
-        text = (self.generator(prompt.SYSTEM_PROMPT, prompt.build_context(hits), question)
-                if self.generator else "[generation pending]")
-        return Response(QueryClass.FACTUAL, text, citations=cits,
-                        scheme=m.canonical_name, evidence_used=len(hits), hits=hits,
-                        conflict=conflict, partial_refusal=partial,
-                        debug={"matched_on": m.matched_on, "topic": topic,
-                               "topic_via": how, "feasibility": lead})
+        return Response(
+            query_class=final_state.get("query_class", QueryClass.OUT_OF_SCOPE),
+            message=final_state.get("message", prompt.NO_EVIDENCE),
+            citations=final_state.get("citations", []),
+            scheme=final_state.get("canonical_name"),
+            evidence_used=len(final_state.get("hits", [])),
+            hits=final_state.get("hits", []),
+            conflict=final_state.get("conflict"),
+            known_gap=final_state.get("known_gap", False),
+            candidates=final_state.get("candidates", []),
+            partial_refusal=final_state.get("partial_refusal"),
+            available=final_state.get("available_labels", []),
+            debug=final_state.get("debug", {})
+        )

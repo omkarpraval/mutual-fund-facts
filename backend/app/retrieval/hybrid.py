@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from rank_bm25 import BM25Okapi
 from app.schemas import Chunk
 from app.retrieval.normaliser import TOPIC_SYNONYMS
+from app.retrieval.qdrant_store import QdrantVectorStore
 
 
 def expand(chunk: Chunk) -> str:
@@ -29,28 +30,8 @@ def expand(chunk: Chunk) -> str:
     return chunk.text
 
 # Two independent gates, and they do different jobs.
-#
-# COVERAGE_FLOOR is the important one. Min-max normalisation always hands
-# the best candidate a 1.0 no matter how irrelevant it is, so a normalised
-# score can never express "nothing here is relevant". A lexical coverage
-# gate can: we require a share of the query's content words to actually
-# appear in the chunk before it is eligible at all.
 COVERAGE_FLOOR = 0.40
-
-# When the question maps to no known FAQ topic, demand much stronger lexical
-# evidence. "Who is the fund manager?" scores 0.50 purely on the generic word
-# "fund" appearing in a regulatory chunk - a match on vocabulary, not on
-# meaning. An unrecognised topic is the single best signal that a question
-# falls outside the taxonomy, so it raises the bar rather than lowering it.
 UNKNOWN_TOPIC_FLOOR = 0.65
-
-# NOTE: a numeric relevance floor used to sit here and has been removed.
-# D025 established that the coverage gate decides ELIGIBILITY and the
-# normalised score only RANKS the survivors. Keeping a score floor as
-# well contradicted that and silently discarded correct evidence: the
-# right TER chunk normalised to 0.11, just under a 0.12 floor, so the
-# answer fell back to a general regulatory chunk. Eligibility is decided
-# in exactly one place.
 
 STOPWORDS = {
     "a", "an", "the", "is", "are", "was", "were", "be", "of", "for", "to",
@@ -97,6 +78,8 @@ class HybridRetriever:
         self.alpha = alpha
         self._expanded = [expand(c) for c in chunks]
         self._bm25 = BM25Okapi([_tok(t) for t in self._expanded])
+        # Initialize Qdrant embedded vector store with payload indexing
+        self.qdrant = QdrantVectorStore(chunks, embedder=embedder)
         self._vecs = embedder.encode([c.text for c in chunks]) if embedder else None
 
     @staticmethod
